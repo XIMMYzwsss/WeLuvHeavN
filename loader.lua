@@ -6,33 +6,33 @@ local BASE = "https://raw.githubusercontent.com/XIMMYzwsss/WeLuvHeavN/main/Scrip
 local Games = {
     {
         Name = "Phantom Forces",
-        PlaceIds = { 292439477, 254965063 }, -- PC + Console
+        PlaceIds = { 292439477, 254965063 },
         GameIds = { 113491250 },
-        Url = BASE .. "pf",
+        File = "pf",
     },
     {
         Name = "Da Hood",
         PlaceIds = { 2788229376 },
         GameIds = { 1008451066 },
-        Url = BASE .. "dh",
+        File = "dh",
     },
     {
         Name = "OVERKILL",
         PlaceIds = { 74996816424339 },
         GameIds = {},
-        Url = BASE .. "overkill",
+        File = "overkill",
     },
     {
         Name = "Violence District",
         PlaceIds = { 93978595733734 },
         GameIds = {},
-        Url = BASE .. "vd",
+        File = "vd",
     },
     {
         Name = "Zee",
         PlaceIds = { 109555340497701 },
         GameIds = {},
-        Url = BASE .. "zee",
+        File = "zee",
     },
 }
 
@@ -50,27 +50,36 @@ local function matches(entry)
     return false
 end
 
+local function bust(url)
+    local sep = string.find(url, "?", 1, true) and "&" or "?"
+    return url .. sep .. "t=" .. tostring(math.floor(os.clock() * 1e6))
+end
+
+local function isMissing(src)
+    if typeof(src) ~= "string" then
+        return true
+    end
+    local trim = string.match(src, "^%s*(.-)%s*$") or src
+    if string.sub(trim, 1, 3) == "404" then
+        return true
+    end
+    if string.lower(string.sub(trim, 1, 9)) == "not found" then
+        return true
+    end
+    return false
+end
+
 local function loadScript(url)
-    local ok, src = pcall(game.HttpGet, game, url)
-    if not ok or typeof(src) ~= "string" or src == "" then
-        warn("[Loader] HttpGet failed:", url, src)
+    local ok, src = pcall(game.HttpGet, game, bust(url))
+    if not ok or typeof(src) ~= "string" or src == "" or isMissing(src) then
         return false
     end
-    if string.find(src, "^404") or string.find(src, "Not Found") then
-        warn("[Loader] 404 — file missing on GitHub:", url)
-        return false
-    end
-    local fn, err = loadstring(src)
+    local fn = loadstring(src)
     if not fn then
-        warn("[Loader] loadstring failed:", err)
         return false
     end
-    local ran, runErr = pcall(fn)
-    if not ran then
-        warn("[Loader] script error:", runErr)
-        return false
-    end
-    return true
+    local ran = pcall(fn)
+    return ran == true
 end
 
 local found = nil
@@ -82,11 +91,13 @@ for _, entry in ipairs(Games) do
 end
 
 if not found then
-    warn(string.format("[Loader] No script for PlaceId=%s GameId=%s", tostring(PlaceId), tostring(GameId)))
+    warn("[Loader] No script for this game")
     return
 end
 
-print(string.format("[Loader] Detected %s — loading…", found.Name))
-if not loadScript(found.Url) then
-    warn(string.format("[Loader] Failed to load %s", found.Name))
+print(string.format("Loading for %s", found.Name))
+if loadScript(BASE .. found.File) then
+    print(string.format("Loaded for %s", found.Name))
+else
+    warn(string.format("Failed for %s", found.Name))
 end
