@@ -1,36 +1,38 @@
 local PlaceId = game.PlaceId
 local GameId = game.GameId
 
+local BASE = "https://raw.githubusercontent.com/XIMMYzwsss/WeLuvHeavN/main/Scripts/"
+
 local Games = {
     {
         Name = "Phantom Forces",
         PlaceIds = { 292439477, 254965063 }, -- PC + Console
         GameIds = { 113491250 },
-        Url = "https://raw.githubusercontent.com/USER/REPO/main/pf.lua",
+        Url = BASE .. "pf",
     },
     {
         Name = "Da Hood",
         PlaceIds = { 2788229376 },
         GameIds = { 1008451066 },
-        Url = "https://raw.githubusercontent.com/USER/REPO/main/dh.lua",
+        Url = BASE .. "dh",
     },
     {
         Name = "OVERKILL",
         PlaceIds = { 74996816424339 },
         GameIds = {},
-        Url = "https://raw.githubusercontent.com/USER/REPO/main/overkill.lua",
+        Url = BASE .. "overkill",
     },
     {
         Name = "Violence District",
         PlaceIds = { 93978595733734 },
         GameIds = {},
-        Url = "https://raw.githubusercontent.com/USER/REPO/main/vd.lua",
+        Url = BASE .. "vd",
     },
     {
         Name = "Zee",
         PlaceIds = { 109555340497701 },
         GameIds = {},
-        Url = "https://raw.githubusercontent.com/USER/REPO/main/zee-autoshoot.luau",
+        Url = BASE .. "zee",
     },
 }
 
@@ -52,6 +54,10 @@ local function loadScript(url)
     local ok, src = pcall(game.HttpGet, game, url)
     if not ok or typeof(src) ~= "string" or src == "" then
         warn("[Loader] HttpGet failed:", url, src)
+        return false
+    end
+    if string.find(src, "^404") or string.find(src, "Not Found") then
+        warn("[Loader] 404 — file missing on GitHub:", url)
         return false
     end
     local fn, err = loadstring(src)
