@@ -6,7 +6,7 @@ local BASE = "https://raw.githubusercontent.com/XIMMYzwsss/WeLuvHeavN/main/Scrip
 local Games = {
     {
         Name = "Phantom Forces",
-        PlaceIds = { 292439477, 254965063 },
+        PlaceIds = { 292439477, 254965063 }, -- PC + Console
         GameIds = { 113491250 },
         File = "pf",
     },
@@ -30,7 +30,7 @@ local Games = {
     },
     {
         Name = "Zee",
-        PlaceIds = { 109555340497701 },
+        PlaceIds = { 109555340497701, 86077535020995, 76583662972544 },
         GameIds = {},
         File = "zee",
     },
