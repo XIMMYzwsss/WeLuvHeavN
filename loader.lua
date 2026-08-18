@@ -30,19 +30,49 @@ local Games = {
     },
     {
         Name = "Zee",
-        PlaceIds = { 109555340497701, 86077535020995, 76583662972544 },
+        PlaceIds = {},
         GameIds = {},
         File = "zee",
+        Detect = function()
+            local rs = game:GetService("ReplicatedStorage")
+            local modules = rs:FindFirstChild("Modules")
+            if not (modules and modules:FindFirstChild("GunHandler")) then
+                return false
+            end
+            local function isRE(folder, name)
+                local inst = folder and folder:FindFirstChild(name)
+                return inst ~= nil and inst:IsA("RemoteEvent")
+            end
+            local function isRF(folder, name)
+                local inst = folder and folder:FindFirstChild(name)
+                return inst ~= nil and inst:IsA("RemoteFunction")
+            end
+            local gameRemotes = rs:FindFirstChild("GameRemotes")
+            local mainRemotes = rs:FindFirstChild("MainRemotes")
+            local remotes = rs:FindFirstChild("Remotes")
+            local gameFolder = rs:FindFirstChild("Game")
+            local gameInner = gameFolder and gameFolder:FindFirstChild("Remotes")
+            return isRE(gameRemotes, "MainGameEvent")
+                or isRE(mainRemotes, "MainRemoteEvent")
+                or isRE(mainRemotes, "MainGameEvent")
+                or isRE(remotes, "MainRemoteEvent")
+                or isRE(gameInner, "MainRemoteEvent")
+                or isRF(gameInner, "InvokeServer")
+        end,
     },
 }
 
 local function matches(entry)
-    for _, id in ipairs(entry.PlaceIds) do
+    if typeof(entry.Detect) == "function" then
+        local ok, result = pcall(entry.Detect)
+        return ok and result == true
+    end
+    for _, id in ipairs(entry.PlaceIds or {}) do
         if id == PlaceId then
             return true
         end
     end
-    for _, id in ipairs(entry.GameIds) do
+    for _, id in ipairs(entry.GameIds or {}) do
         if id == GameId then
             return true
         end
