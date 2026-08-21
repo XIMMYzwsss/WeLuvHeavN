@@ -58,6 +58,8 @@ local Games = {
                 or isRE(remotes, "MainRemoteEvent")
                 or isRE(gameInner, "MainRemoteEvent")
                 or isRF(gameInner, "InvokeServer")
+                or isRF(mainRemotes, "InvokeServer")
+                or rs:FindFirstChild("DerHood") ~= nil
         end,
     },
 }
